@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Garden Activity Logger{% endblock %}</title>
+    <link href="/static/css/style.css" rel="stylesheet">
+    <script src="https://unpkg.com/htmx.org@1.9.6"></script>
+</head>
+<body>
+    <!-- Toast notification container -->
+    <div id="toast-container" class="toast-container"></div>
+
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="/" class="nav-brand">🌱 Garden Logger</a>
+            <ul class="nav-menu">
+                <li><a href="/gardens">Gardens</a></li>
+                <li><a href="/plant-types">Plant Types</a></li>
+                <li><a href="/harvests">Log Harvest</a></li>
+                <li><a href="/harvest-summary">Harvest Summary</a></li>
+                <li><a href="/activities">Garden Activities</a></li>
+                <li><a href="/plants">My Plants</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <main class="main-content">
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="footer">
+        <p>&copy; 2024 Garden Activity Logger</p>
+    </footer>
+
+    <script>
+
+        // Toast notification system
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `toast toast-${type}`;
+
+            // Add appropriate emoji based on type
+            const emoji = type === 'success' ? '✅' : type === 'error' ? '❌' : 'ℹ️';
+            toast.innerHTML = `${emoji} ${message}`;
+
+            container.appendChild(toast);
+
+            // Trigger animation
+            setTimeout(() => toast.classList.add('toast-show'), 100);
+
+            // Remove toast after 3 seconds
+            setTimeout(() => {
+                toast.classList.add('toast-hide');
+                setTimeout(() => container.removeChild(toast), 300);
+            }, 3000);
+        }
+
+        // Function to clear form inputs
+        function clearForm(form) {
+            // Clear all text inputs
+            const textInputs = form.querySelectorAll('input[type="text"], input[type="number"], input[type="date"]');
+            textInputs.forEach(input => input.value = '');
+
+            // Clear all textareas
+            const textareas = form.querySelectorAll('textarea');
+            textareas.forEach(textarea => textarea.value = '');
+
+            // Reset all select dropdowns to first option (empty option)
+            const selects = form.querySelectorAll('select');
+            selects.forEach(select => select.selectedIndex = 0);
+        }
+
+        // Listen for HTMX events to show appropriate toasts and clear forms
+        document.body.addEventListener('htmx:afterRequest', function(evt) {
+            if (evt.detail.successful) {
+                const path = evt.detail.pathInfo.requestPath;
+                let message = 'Action completed successfully!';
+
+                // Customize message based on the endpoint
+                if (path === '/plant-types') {
+                    message = 'Plant type added successfully! 🌿';
+                } else if (path === '/harvests') {
+                    message = 'Harvest logged successfully! 🥕';
+                } else if (path === '/activities') {
+                    message = 'Garden activity logged! 💧';
+                } else if (path === '/plants') {
+                    message = 'Plant added successfully! 🪴';
+                } else if (path.includes('/journal')) {
+                    message = 'Journal entry added! 📖';
+                }
+
+                showToast(message, 'success');
+
+                // Clear the form that was submitted
+                const form = evt.detail.elt;
+                if (form && form.tagName === 'FORM') {
+                    clearForm(form);
+                }
+            } else {
+                showToast('Something went wrong. Please try again.', 'error');
+            }
+        });
+
+        // Show error toast for HTMX errors
+        document.body.addEventListener('htmx:responseError', function(evt) {
+            showToast('Error: Unable to complete action', 'error');
+        });
+
+        document.body.addEventListener('htmx:sendError', function(evt) {
+            showToast('Network error. Please check your connection.', 'error');
+        });
+
+        // Set today's date as default for date inputs when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            const today = new Date().toISOString().split('T')[0];
+            const dateInputs = document.querySelectorAll('input[type="date"]');
+            dateInputs.forEach(input => {
+                if (!input.value) {
+                    input.value = today;
+                }
+            });
+
+            // Update navigation links with preferred garden ID
+            updateNavigationLinks();
+
+            // If no garden_id in URL but we have a preference, redirect
+            const urlParams = new URLSearchParams(window.location.search);
+            const preferredGardenId = getPreferredGardenId();
+
+            if (!urlParams.has('garden_id') && preferredGardenId && window.location.pathname !== '/' && window.location.pathname !== '/gardens') {
+                const currentPath = window.location.pathname;
+                const newUrl = `${currentPath}?garden_id=${preferredGardenId}`;
+                window.location.href = newUrl;
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,37 @@
+<div class="garden-card" id="garden-{{ garden.id }}">
+    <div class="edit-form-container">
+        <h3>✏️ Edit Garden</h3>
+        <form hx-put="/gardens/{{ garden.id }}" hx-target="#gardens-list" hx-swap="outerHTML">
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="edit-name-{{ garden.id }}">Garden Name:</label>
+                    <input type="text" id="edit-name-{{ garden.id }}" name="name" value="{{ garden.name }}" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="edit-year-{{ garden.id }}">Year:</label>
+                    <input type="number" id="edit-year-{{ garden.id }}" name="year" value="{{ garden.year }}" min="2020" max="2030" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="edit-location-{{ garden.id }}">Location:</label>
+                    <input type="text" id="edit-location-{{ garden.id }}" name="location" value="{{ garden.location or '' }}">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="edit-description-{{ garden.id }}">Description:</label>
+                <textarea id="edit-description-{{ garden.id }}" name="description" rows="2">{{ garden.description or '' }}</textarea>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary btn-sm">Save Changes</button>
+                <button type="button" 
+                        hx-get="/gardens" 
+                        hx-target="#gardens-list" 
+                        hx-swap="outerHTML"
+                        class="btn btn-secondary btn-sm">Cancel</button>
+            </div>
+        </form>
+    </div>
+</div>

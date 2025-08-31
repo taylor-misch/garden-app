@@ -1,0 +1,36 @@
+<div class="record-item" id="activity-{{ activity.id }}">
+    <div class="edit-form-container">
+        <h3>✏️ Edit Activity</h3>
+        <form hx-put="/activities/{{ activity.id }}" hx-target="#activities-list" hx-swap="outerHTML">
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="edit-activity-type-{{ activity.id }}">Activity Type:</label>
+                    <select id="edit-activity-type-{{ activity.id }}" name="activity_type" required>
+                        <option value="watering" {% if activity.activity_type == 'watering' %}selected{% endif %}>Watering</option>
+                        <option value="fertilizing" {% if activity.activity_type == 'fertilizing' %}selected{% endif %}>Fertilizing</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="edit-activity-date-{{ activity.id }}">Date:</label>
+                    <input type="date" id="edit-activity-date-{{ activity.id }}" name="activity_date" 
+                           value="{{ activity.activity_date }}" required>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="edit-activity-notes-{{ activity.id }}">Notes:</label>
+                <textarea id="edit-activity-notes-{{ activity.id }}" name="notes" rows="2">{{ activity.notes or '' }}</textarea>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary btn-sm">Save Changes</button>
+                <button type="button" 
+                        hx-get="/activities" 
+                        hx-target="#activities-list" 
+                        hx-swap="outerHTML"
+                        class="btn btn-secondary btn-sm">Cancel</button>
+            </div>
+        </form>
+    </div>
+</div>

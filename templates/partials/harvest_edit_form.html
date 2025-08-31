@@ -1,0 +1,58 @@
+<div class="record-item" id="harvest-{{ harvest.id }}">
+    <div class="edit-form-container">
+        <h3>✏️ Edit Harvest</h3>
+        <form hx-put="/harvests/{{ harvest.id }}" hx-target="#harvests-list" hx-swap="outerHTML">
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="edit-plant-type-{{ harvest.id }}">Plant Type:</label>
+                    <select id="edit-plant-type-{{ harvest.id }}" name="plant_type_id" required>
+                        {% for plant_type in plant_types %}
+                            <option value="{{ plant_type.id }}" 
+                                    {% if plant_type.id == harvest.plant_type_id %}selected{% endif %}>
+                                {{ plant_type.name }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="edit-quantity-{{ harvest.id }}">Quantity:</label>
+                    <input type="number" id="edit-quantity-{{ harvest.id }}" name="quantity" 
+                           value="{{ harvest.quantity }}" step="0.1" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="edit-unit-{{ harvest.id }}">Unit:</label>
+                    <select id="edit-unit-{{ harvest.id }}" name="unit" required>
+                        <option value="lbs" {% if harvest.unit == 'lbs' %}selected{% endif %}>Pounds</option>
+                        <option value="oz" {% if harvest.unit == 'oz' %}selected{% endif %}>Ounces</option>
+                        <option value="kg" {% if harvest.unit == 'kg' %}selected{% endif %}>Kilograms</option>
+                        <option value="g" {% if harvest.unit == 'g' %}selected{% endif %}>Grams</option>
+                        <option value="pieces" {% if harvest.unit == 'pieces' %}selected{% endif %}>Pieces</option>
+                        <option value="bunches" {% if harvest.unit == 'bunches' %}selected{% endif %}>Bunches</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="edit-date-{{ harvest.id }}">Date:</label>
+                    <input type="date" id="edit-date-{{ harvest.id }}" name="harvest_date" 
+                           value="{{ harvest.harvest_date }}" required>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="edit-notes-{{ harvest.id }}">Notes:</label>
+                <textarea id="edit-notes-{{ harvest.id }}" name="notes" rows="2">{{ harvest.notes or '' }}</textarea>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary btn-sm">Save Changes</button>
+                <button type="button" 
+                        hx-get="/harvests" 
+                        hx-target="#harvests-list" 
+                        hx-swap="outerHTML"
+                        class="btn btn-secondary btn-sm">Cancel</button>
+            </div>
+        </form>
+    </div>
+</div>

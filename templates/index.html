@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+
+{% block title %}Home - Garden Activity Logger{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="hero">
+        <h1>🌱 Welcome to Your Garden Activity Logger</h1>
+        {% if current_garden %}
+            <p>Currently viewing: <strong>{{ current_garden.name }}</strong> ({{ current_garden.year }})</p>
+            {% if current_garden.description %}
+                <p class="garden-description">{{ current_garden.description }}</p>
+            {% endif %}
+        {% endif %}
+        <p>Track your garden activities throughout the growing season</p>
+    </div>
+
+    <div class="features-grid">
+        <div class="feature-card">
+            <h3>🏡 Gardens</h3>
+            <p>Manage your gardens and create new ones for different seasons</p>
+            <a href="/gardens" class="btn btn-primary">Manage Gardens</a>
+        </div>
+
+        <div class="feature-card">
+            <h3>🌿 Plant Types</h3>
+            <p>Manage the types of plants you're growing in your garden</p>
+            <a href="/plant-types?garden_id={{ current_garden.id if current_garden }}" class="btn btn-primary">Manage Plant Types</a>
+        </div>
+
+        <div class="feature-card">
+            <h3>🥕 Log Harvests</h3>
+            <p>Record your daily harvest quantities and track production</p>
+            <a href="/harvests?garden_id={{ current_garden.id if current_garden }}" class="btn btn-primary">Log Harvest</a>
+        </div>
+
+        <div class="feature-card">
+            <h3>📊 Harvest Summary</h3>
+            <p>View total production for each type of plant</p>
+            <a href="/harvest-summary?garden_id={{ current_garden.id if current_garden }}" class="btn btn-primary">View Summary</a>
+        </div>
+
+        <div class="feature-card">
+            <h3>💧 Garden Activities</h3>
+            <p>Track watering and fertilizing schedules</p>
+            <a href="/activities?garden_id={{ current_garden.id if current_garden }}" class="btn btn-primary">Log Activities</a>
+        </div>
+
+        <div class="feature-card">
+            <h3>🪴 My Plants</h3>
+            <p>Track individual plants and maintain growing journals</p>
+            <a href="/plants?garden_id={{ current_garden.id if current_garden }}" class="btn btn-primary">Manage Plants</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

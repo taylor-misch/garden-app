@@ -1,0 +1,44 @@
+<div id="harvests-list">
+    {% if harvests %}
+        <div class="grouped-records">
+            {% for date_group in harvests %}
+                <div class="date-group">
+                    <div class="date-header">
+                        <h3>📅 {{ date_group.date }}</h3>
+                        <span class="harvest-count">{{ date_group.harvests|length }} harvest{% if date_group.harvests|length != 1 %}s{% endif %}</span>
+                    </div>
+                    <div class="date-records">
+                        {% for harvest in date_group.harvests %}
+                            <div class="record-item harvest-record" id="harvest-{{ harvest.id }}">
+                                <div class="harvest-content">
+                                    <div class="harvest-main">
+                                        <h4>{{ harvest.plant_name }}</h4>
+                                        {% if harvest.notes %}
+                                            <p class="notes">{{ harvest.notes }}</p>
+                                        {% endif %}
+                                    </div>
+                                    <div class="harvest-quantity">
+                                        <span class="quantity">{{ harvest.quantity }} {{ harvest.unit }}</span>
+                                    </div>
+                                    <div class="harvest-actions">
+                                        <button hx-get="/harvests/{{ harvest.id }}/edit" 
+                                                hx-target="#harvest-{{ harvest.id }}" 
+                                                hx-swap="outerHTML"
+                                                class="btn btn-secondary btn-xs">Edit</button>
+                                        <button hx-delete="/harvests/{{ harvest.id }}" 
+                                                hx-target="#harvests-list" 
+                                                hx-swap="outerHTML"
+                                                hx-confirm="Are you sure you want to delete this harvest record?"
+                                                class="btn btn-danger btn-xs">Delete</button>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p class="empty-message">No harvests logged yet. Log your first harvest above!</p>
+    {% endif %}
+</div>

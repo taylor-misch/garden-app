@@ -1,0 +1,25 @@
+<div class="item-card" id="plant-type-{{ plant_type.id }}">
+    <div class="edit-form-container">
+        <h3>✏️ Edit Plant Type</h3>
+        <form hx-put="/plant-types/{{ plant_type.id }}" hx-target="#plant-types-list" hx-swap="outerHTML">
+            <div class="form-group">
+                <label for="edit-name-{{ plant_type.id }}">Plant Name:</label>
+                <input type="text" id="edit-name-{{ plant_type.id }}" name="name" value="{{ plant_type.name }}" required>
+            </div>
+
+            <div class="form-group">
+                <label for="edit-description-{{ plant_type.id }}">Description:</label>
+                <textarea id="edit-description-{{ plant_type.id }}" name="description" rows="2">{{ plant_type.description or '' }}</textarea>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary btn-sm">Save Changes</button>
+                <button type="button" 
+                        hx-get="/plant-types" 
+                        hx-target="#plant-types-list" 
+                        hx-swap="outerHTML"
+                        class="btn btn-secondary btn-sm">Cancel</button>
+            </div>
+        </form>
+    </div>
+</div>

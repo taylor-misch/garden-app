@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+
+{% block title %}Garden Activities - Garden Activity Logger{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="page-header">
+        <h1>💧 Garden Activities</h1>
+        {% if gardens|length > 1 %}
+            <select id="garden-select-activities" class="garden-dropdown-inline" onchange="switchGardenAndReload(this.value, '/activities')">
+                {% for garden in gardens %}
+                    <option value="{{ garden.id }}" {% if current_garden and garden.id == current_garden.id %}selected{% endif %}>
+                        {{ garden.name }} ({{ garden.year }})
+                    </option>
+                {% endfor %}
+            </select>
+        {% elif current_garden %}
+            <span class="current-garden-inline">{{ current_garden.name }} ({{ current_garden.year }})</span>
+        {% endif %}
+    </div>
+
+    <div class="form-section">
+        <h2>Log Activity</h2>
+        <form hx-post="/activities" hx-target="#activities-list" hx-swap="outerHTML">
+            <input type="hidden" name="garden_id" value="{{ current_garden.id if current_garden }}">
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="activity_type">Activity Type:</label>
+                    <select id="activity_type" name="activity_type" required>
+                        <option value="">Select activity...</option>
+                        <option value="watering">💧 Watering</option>
+                        <option value="fertilizing">🌱 Fertilizing</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="activity_date">Date:</label>
+                    <input type="date" id="activity_date" name="activity_date" required>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="notes">Notes (optional):</label>
+                <textarea id="notes" name="notes" rows="2" placeholder="Any notes about this activity..."></textarea>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Log Activity</button>
+        </form>
+    </div>
+
+    <div class="list-section">
+        <h2>Recent Activities</h2>
+        <div id="activities-list">
+            {% include "partials/activities_list.html" %}
+        </div>
+    </div>
+</div>
+{% endblock %}

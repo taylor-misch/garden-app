@@ -1,0 +1,39 @@
+<div id="plants-list">
+    {% if plants %}
+        <div class="plants-grid">
+            {% for plant in plants %}
+                <div class="plant-card" id="plant-{{ plant.id }}">
+                    <div class="plant-header">
+                        <h4>{{ plant.name }}</h4>
+                        <span class="plant-type">{{ plant.plant_type }}</span>
+                    </div>
+                    <div class="plant-details">
+                        {% if plant.planted_date %}
+                            <p><strong>Planted:</strong> {{ plant.planted_date }}</p>
+                        {% endif %}
+                        {% if plant.location %}
+                            <p><strong>Location:</strong> {{ plant.location }}</p>
+                        {% endif %}
+                        <p><strong>Status:</strong> 
+                            <span class="status status-{{ plant.status }}">{{ plant.status|title }}</span>
+                        </p>
+                    </div>
+                    <div class="plant-actions">
+                        <a href="/plants/{{ plant.id }}/journal" class="btn btn-primary btn-sm">📖 Journal</a>
+                        <button hx-get="/plants/{{ plant.id }}/edit" 
+                                hx-target="#plant-{{ plant.id }}" 
+                                hx-swap="outerHTML"
+                                class="btn btn-secondary btn-sm">Edit</button>
+                        <button hx-delete="/plants/{{ plant.id }}" 
+                                hx-target="#plants-list" 
+                                hx-swap="outerHTML"
+                                hx-confirm="Are you sure? This will delete all journal entries for this plant."
+                                class="btn btn-danger btn-sm">Delete</button>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p class="empty-message">No plants added yet. Add your first plant above!</p>
+    {% endif %}
+</div>

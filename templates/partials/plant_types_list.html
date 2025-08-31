@@ -1,0 +1,29 @@
+<div id="plant-types-list">
+    {% if plant_types %}
+        <div class="items-grid">
+            {% for plant_type in plant_types %}
+                <div class="item-card" id="plant-type-{{ plant_type.id }}">
+                    <div class="item-content">
+                        <h3>{{ plant_type.name }}</h3>
+                        {% if plant_type.description %}
+                            <p>{{ plant_type.description }}</p>
+                        {% endif %}
+                    </div>
+                    <div class="item-actions">
+                        <button hx-get="/plant-types/{{ plant_type.id }}/edit" 
+                                hx-target="#plant-type-{{ plant_type.id }}" 
+                                hx-swap="outerHTML"
+                                class="btn btn-secondary btn-sm">Edit</button>
+                        <button hx-delete="/plant-types/{{ plant_type.id }}" 
+                                hx-target="#plant-types-list" 
+                                hx-swap="outerHTML"
+                                hx-confirm="Are you sure? This will delete all harvests and plants of this type."
+                                class="btn btn-danger btn-sm">Delete</button>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p class="empty-message">No plant types added yet. Add your first plant type above!</p>
+    {% endif %}
+</div>

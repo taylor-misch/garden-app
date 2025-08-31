@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block title %}Harvest Summary - Garden Activity Logger{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="page-header">
+        <h1>📊 Harvest Summary</h1>
+        {% if gardens|length > 1 %}
+            <select id="garden-select-summary" class="garden-dropdown-inline" onchange="switchGardenAndReload(this.value, '/harvest-summary')">
+                {% for garden in gardens %}
+                    <option value="{{ garden.id }}" {% if current_garden and garden.id == current_garden.id %}selected{% endif %}>
+                        {{ garden.name }} ({{ garden.year }})
+                    </option>
+                {% endfor %}
+            </select>
+        {% elif current_garden %}
+            <span class="current-garden-inline">{{ current_garden.name }} ({{ current_garden.year }})</span>
+        {% endif %}
+    </div>
+
+    <div class="summary-section">
+        {% if summary %}
+            <div class="summary-grid">
+                {% for item in summary %}
+                    <div class="summary-card">
+                        <h3>{{ item.plant_name }}</h3>
+                        <div class="summary-amount">
+                            <span class="amount">{{ item.total_quantity }}</span>
+                            <span class="unit">{{ item.unit }}</span>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p class="empty-message">No harvest data available for this garden yet.</p>
+            <a href="/harvests?garden_id={{ current_garden.id if current_garden }}" class="btn btn-primary">Start Logging Harvests</a>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

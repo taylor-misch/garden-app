@@ -1,0 +1,57 @@
+<div class="plant-card" id="plant-{{ plant.id }}">
+    <div class="edit-form-container">
+        <h3>✏️ Edit Plant</h3>
+        <form hx-put="/plants/{{ plant.id }}" hx-target="#plants-list" hx-swap="outerHTML">
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="edit-plant-type-{{ plant.id }}">Plant Type:</label>
+                    <select id="edit-plant-type-{{ plant.id }}" name="plant_type_id" required>
+                        {% for plant_type in plant_types %}
+                            <option value="{{ plant_type.id }}" 
+                                    {% if plant_type.id == plant.plant_type_id %}selected{% endif %}>
+                                {{ plant_type.name }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="edit-plant-name-{{ plant.id }}">Plant Name:</label>
+                    <input type="text" id="edit-plant-name-{{ plant.id }}" name="name" 
+                           value="{{ plant.name }}" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="edit-planted-date-{{ plant.id }}">Planted Date:</label>
+                    <input type="date" id="edit-planted-date-{{ plant.id }}" name="planted_date" 
+                           value="{{ plant.planted_date or '' }}">
+                </div>
+
+                <div class="form-group">
+                    <label for="edit-location-{{ plant.id }}">Location:</label>
+                    <input type="text" id="edit-location-{{ plant.id }}" name="location" 
+                           value="{{ plant.location or '' }}">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="edit-status-{{ plant.id }}">Status:</label>
+                <select id="edit-status-{{ plant.id }}" name="status">
+                    <option value="active" {% if plant.status == 'active' %}selected{% endif %}>Active</option>
+                    <option value="harvested" {% if plant.status == 'harvested' %}selected{% endif %}>Harvested</option>
+                    <option value="dead" {% if plant.status == 'dead' %}selected{% endif %}>Dead</option>
+                    <option value="dormant" {% if plant.status == 'dormant' %}selected{% endif %}>Dormant</option>
+                </select>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary btn-sm">Save Changes</button>
+                <button type="button" 
+                        hx-get="/plants" 
+                        hx-target="#plants-list" 
+                        hx-swap="outerHTML"
+                        class="btn btn-secondary btn-sm">Cancel</button>
+            </div>
+        </form>
+    </div>
+</div>

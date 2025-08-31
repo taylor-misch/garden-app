@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block title %}Plant Types - Garden Activity Logger{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="page-header">
+        <h1>🌿 Plant Types</h1>
+        {% if gardens|length > 1 %}
+            <select id="garden-select-plant-types" class="garden-dropdown-inline" onchange="switchGardenAndReload(this.value, '/plant-types')">
+                {% for garden in gardens %}
+                    <option value="{{ garden.id }}" {% if current_garden and garden.id == current_garden.id %}selected{% endif %}>
+                        {{ garden.name }} ({{ garden.year }})
+                    </option>
+                {% endfor %}
+            </select>
+        {% elif current_garden %}
+            <span class="current-garden-inline">{{ current_garden.name }} ({{ current_garden.year }})</span>
+        {% endif %}
+    </div>
+
+    <div class="form-section">
+        <h2>Add New Plant Type</h2>
+        <form hx-post="/plant-types" hx-target="#plant-types-list" hx-swap="outerHTML">
+            <input type="hidden" name="garden_id" value="{{ current_garden.id if current_garden }}">
+
+            <div class="form-group">
+                <label for="name">Plant Name:</label>
+                <input type="text" id="name" name="name" placeholder="e.g., Tomatoes, Lettuce, Carrots" required>
+            </div>
+
+            <div class="form-group">
+                <label for="description">Description (optional):</label>
+                <textarea id="description" name="description" rows="3" placeholder="Variety, growing notes, etc."></textarea>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Add Plant Type</button>
+        </form>
+    </div>
+
+    <div class="list-section">
+        <h2>Current Plant Types</h2>
+        <div id="plant-types-list">
+            {% include "partials/plant_types_list.html" %}
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+
+{% block title %}My Plants - Garden Activity Logger{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="page-header">
+        <h1>🪴 My Plants</h1>
+        {% if gardens|length > 1 %}
+            <select id="garden-select-plants" class="garden-dropdown-inline" onchange="switchGardenAndReload(this.value, '/plants')">
+                {% for garden in gardens %}
+                    <option value="{{ garden.id }}" {% if current_garden and garden.id == current_garden.id %}selected{% endif %}>
+                        {{ garden.name }} ({{ garden.year }})
+                    </option>
+                {% endfor %}
+            </select>
+        {% elif current_garden %}
+            <span class="current-garden-inline">{{ current_garden.name }} ({{ current_garden.year }})</span>
+        {% endif %}
+    </div>
+
+    <div class="form-section">
+        <h2>Add New Plant</h2>
+        {% if plant_types %}
+            <form hx-post="/plants" hx-target="#plants-list" hx-swap="outerHTML">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="plant_type_id">Plant Type:</label>
+                        <select id="plant_type_id" name="plant_type_id" required>
+                            <option value="">Select plant type...</option>
+                            {% for plant_type in plant_types %}
+                                <option value="{{ plant_type.id }}">{{ plant_type.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="name">Plant Name/ID:</label>
+                        <input type="text" id="name" name="name" placeholder="e.g., Tomato #1, Big Pepper" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="planted_date">Planted Date (optional):</label>
+                        <input type="date" id="planted_date" name="planted_date">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="location">Location (optional):</label>
+                        <input type="text" id="location" name="location" placeholder="e.g., Row 1, Bed A, Greenhouse">
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary">Add Plant</button>
+            </form>
+        {% else %}
+            <div class="info-message">
+                <p>⚠️ No plant types found for this garden. <a href="/plant-types?garden_id={{ current_garden.id if current_garden }}">Add plant types first</a> before adding individual plants.</p>
+            </div>
+        {% endif %}
+    </div>
+
+    <div class="list-section">
+        <h2>My Plants</h2>
+        <div id="plants-list">
+            {% include "partials/plants_list.html" %}
+        </div>
+    </div>
+</div>
+{% endblock %}

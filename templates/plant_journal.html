@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+
+{% block title %}{{ plant.name }} Journal - Garden Activity Logger{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="page-header">
+        <h1>📖 {{ plant.name }} Journal</h1>
+        <p>{{ plant.plant_type }} - Growing journal and notes</p>
+        <a href="/plants" class="btn btn-secondary">← Back to Plants</a>
+    </div>
+
+    <div class="plant-info">
+        <div class="info-grid">
+            {% if plant.planted_date %}
+                <div class="info-item">
+                    <strong>Planted:</strong> {{ plant.planted_date }}
+                </div>
+            {% endif %}
+            {% if plant.location %}
+                <div class="info-item">
+                    <strong>Location:</strong> {{ plant.location }}
+                </div>
+            {% endif %}
+            <div class="info-item">
+                <strong>Status:</strong> {{ plant.status|title }}
+            </div>
+        </div>
+    </div>
+
+    <div class="form-section">
+        <h2>Add Journal Entry</h2>
+        <form hx-post="/plants/{{ plant.id }}/journal" hx-target="#journal-entries-list" hx-swap="outerHTML">
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="entry_date">Date:</label>
+                    <input type="date" id="entry_date" name="entry_date" required>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="notes">Notes:</label>
+                <textarea id="notes" name="notes" rows="4" placeholder="Record observations, care activities, progress notes..." required></textarea>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Add Entry</button>
+        </form>
+    </div>
+
+    <div class="list-section">
+        <h2>Journal Entries</h2>
+        <div id="journal-entries-list">
+            {% include "partials/journal_entries_list.html" %}
+        </div>
+    </div>
+</div>
+{% endblock %}

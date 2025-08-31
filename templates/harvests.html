@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+
+{% block title %}Log Harvests - Garden Activity Logger{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="page-header">
+        <h1>🥕 Log Harvests</h1>
+        {% if gardens|length > 1 %}
+            <select id="garden-select-harvests" class="garden-dropdown-inline" onchange="switchGardenAndReload(this.value, '/harvests')">
+                {% for garden in gardens %}
+                    <option value="{{ garden.id }}" {% if current_garden and garden.id == current_garden.id %}selected{% endif %}>
+                        {{ garden.name }} ({{ garden.year }})
+                    </option>
+                {% endfor %}
+            </select>
+        {% elif current_garden %}
+            <span class="current-garden-inline">{{ current_garden.name }} ({{ current_garden.year }})</span>
+        {% endif %}
+    </div>
+
+    <div class="form-section">
+        <h2>Add New Harvest</h2>
+        {% if plant_types %}
+            <form hx-post="/harvests" hx-target="#harvests-list" hx-swap="outerHTML">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="plant_type_id">Plant Type:</label>
+                        <select id="plant_type_id" name="plant_type_id" required>
+                            <option value="">Select plant type...</option>
+                            {% for plant_type in plant_types %}
+                                <option value="{{ plant_type.id }}">{{ plant_type.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="quantity">Quantity:</label>
+                        <input type="number" id="quantity" name="quantity" step="0.1" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="unit">Unit:</label>
+                        <select id="unit" name="unit" required>
+                            <option value="">Select unit...</option>
+                            <option value="lbs">Pounds</option>
+                            <option value="oz">Ounces</option>
+                            <option value="kg">Kilograms</option>
+                            <option value="g">Grams</option>
+                            <option value="pieces">Pieces</option>
+                            <option value="bunches">Bunches</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="harvest_date">Harvest Date:</label>
+                        <input type="date" id="harvest_date" name="harvest_date" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="notes">Notes (optional):</label>
+                    <textarea id="notes" name="notes" rows="2" placeholder="Any notes about this harvest..."></textarea>
+                </div>
+
+                <button type="submit" class="btn btn-primary">Log Harvest</button>
+            </form>
+        {% else %}
+            <div class="info-message">
+                <p>⚠️ No plant types found for this garden. <a href="/plant-types?garden_id={{ current_garden.id if current_garden }}">Add plant types first</a> before logging harvests.</p>
+            </div>
+        {% endif %}
+    </div>
+
+    <div class="list-section">
+        <h2>Recent Harvests</h2>
+        <div id="harvests-list">
+            {% include "partials/harvests_list.html" %}
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,38 @@
+<div id="gardens-list">
+    {% if gardens %}
+        <div class="gardens-grid">
+            {% for garden in gardens %}
+                <div class="garden-card" id="garden-{{ garden.id }}">
+                    <div class="garden-header">
+                        <h3>{{ garden.name }}</h3>
+                        <span class="garden-year">{{ garden.year }}</span>
+                    </div>
+
+                    <div class="garden-details">
+                        {% if garden.location %}
+                            <p><strong>Location:</strong> {{ garden.location }}</p>
+                        {% endif %}
+                        {% if garden.description %}
+                            <p><strong>Description:</strong> {{ garden.description }}</p>
+                        {% endif %}
+                    </div>
+
+                    <div class="garden-actions">
+                        <a href="/?garden_id={{ garden.id }}" class="btn btn-primary btn-sm">View Garden</a>
+                        <button hx-get="/gardens/{{ garden.id }}/edit" 
+                                hx-target="#garden-{{ garden.id }}" 
+                                hx-swap="outerHTML"
+                                class="btn btn-secondary btn-sm">Edit</button>
+                        <button hx-delete="/gardens/{{ garden.id }}" 
+                                hx-target="#gardens-list" 
+                                hx-swap="outerHTML"
+                                hx-confirm="Are you sure you want to delete this garden? This will delete all associated data."
+                                class="btn btn-danger btn-sm">Delete</button>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p class="empty-message">No gardens created yet. Add your first garden above!</p>
+    {% endif %}
+</div>

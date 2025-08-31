@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+
+{% block title %}Gardens - Garden Activity Logger{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="page-header">
+        <h1>🏡 Gardens</h1>
+        <p>Manage your gardens for different seasons and locations</p>
+    </div>
+
+    <div class="form-section">
+        <h2>Add New Garden</h2>
+        <form hx-post="/gardens" hx-target="#gardens-list" hx-swap="outerHTML">
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="name">Garden Name:</label>
+                    <input type="text" id="name" name="name" placeholder="e.g., Spring Garden 2024" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="year">Year:</label>
+                    <input type="number" id="year" name="year" value="{{ current_year }}" min="2020" max="2030" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="location">Location (optional):</label>
+                    <input type="text" id="location" name="location" placeholder="e.g., Backyard, Greenhouse">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="description">Description (optional):</label>
+                <textarea id="description" name="description" rows="3" placeholder="Describe this garden..."></textarea>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Add Garden</button>
+        </form>
+    </div>
+
+    <div class="list-section">
+        <h2>My Gardens</h2>
+        <div id="gardens-list">
+            {% include "partials/gardens_list.html" %}
+        </div>
+    </div>
+</div>
+
+<script>
+    // Set current year as default
+    document.addEventListener('DOMContentLoaded', function() {
+        const yearInput = document.getElementById('year');
+        if (!yearInput.value) {
+            yearInput.value = new Date().getFullYear();
+        }
+    });
+</script>
+{% endblock %}

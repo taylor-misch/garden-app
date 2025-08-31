@@ -1,0 +1,26 @@
+<div class="journal-entry" id="journal-{{ journal.id }}">
+    <div class="edit-form-container">
+        <h3>✏️ Edit Journal Entry</h3>
+        <form hx-put="/journal/{{ journal.id }}" hx-target="#journal-entries-list" hx-swap="outerHTML">
+            <div class="form-group">
+                <label for="edit-entry-date-{{ journal.id }}">Date:</label>
+                <input type="date" id="edit-entry-date-{{ journal.id }}" name="entry_date" 
+                       value="{{ journal.entry_date }}" required>
+            </div>
+
+            <div class="form-group">
+                <label for="edit-notes-{{ journal.id }}">Notes:</label>
+                <textarea id="edit-notes-{{ journal.id }}" name="notes" rows="4" required>{{ journal.notes }}</textarea>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary btn-sm">Save Changes</button>
+                <button type="button" 
+                        hx-get="/plants/{{ journal.plant_id }}/journal" 
+                        hx-target="#journal-entries-list" 
+                        hx-swap="outerHTML"
+                        class="btn btn-secondary btn-sm">Cancel</button>
+            </div>
+        </form>
+    </div>
+</div>
