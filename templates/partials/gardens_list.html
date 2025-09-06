@@ -2,10 +2,13 @@
     {% if gardens %}
         <div class="gardens-grid">
             {% for garden in gardens %}
-                <div class="garden-card" id="garden-{{ garden.id }}">
+                <div class="garden-card {% if current_garden and garden.id == current_garden.id %}current-garden{% endif %}" id="garden-{{ garden.id }}">
                     <div class="garden-header">
                         <h3>{{ garden.name }}</h3>
                         <span class="garden-year">{{ garden.year }}</span>
+                        {% if current_garden and garden.id == current_garden.id %}
+                            <span class="current-garden-badge">✓ Current</span>
+                        {% endif %}
                     </div>
 
                     <div class="garden-details">
@@ -18,7 +21,13 @@
                     </div>
 
                     <div class="garden-actions">
-                        <a href="/?garden_id={{ garden.id }}" class="btn btn-primary btn-sm">View Garden</a>
+                        <button onclick="switchGardenAndReload({{ garden.id }}, '/')" class="btn btn-primary btn-sm">
+                            {% if current_garden and garden.id == current_garden.id %}
+                                View Garden
+                            {% else %}
+                                Select Garden
+                            {% endif %}
+                        </button>
                         <button hx-get="/gardens/{{ garden.id }}/edit" 
                                 hx-target="#garden-{{ garden.id }}" 
                                 hx-swap="outerHTML"

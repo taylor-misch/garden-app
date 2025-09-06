@@ -135,6 +135,72 @@
                 window.location.href = newUrl;
             }
         });
+
+
+                // Set today's date as default for date inputs when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            const today = new Date().toISOString().split('T')[0];
+            const dateInputs = document.querySelectorAll('input[type="date"]');
+            dateInputs.forEach(input => {
+                if (!input.value) {
+                    input.value = today;
+                }
+            });
+
+            // Update navigation links with preferred garden ID
+            updateNavigationLinks();
+
+            // If no garden_id in URL but we have a preference, redirect
+            const urlParams = new URLSearchParams(window.location.search);
+            const preferredGardenId = getPreferredGardenId();
+
+            if (!urlParams.has('garden_id') && preferredGardenId && window.location.pathname !== '/' && window.location.pathname !== '/gardens') {
+                const currentPath = window.location.pathname;
+                const newUrl = `${currentPath}?garden_id=${preferredGardenId}`;
+                window.location.href = newUrl;
+            }
+        });
+
+        // Function to get preferred garden ID from localStorage
+        function getPreferredGardenId() {
+            return localStorage.getItem('preferredGardenId');
+        }
+
+        // Function to set preferred garden ID in localStorage
+        function setPreferredGardenId(gardenId) {
+            localStorage.setItem('preferredGardenId', gardenId);
+        }
+
+        // Function to switch garden and reload page
+        function switchGardenAndReload(gardenId, path) {
+            // Save the selected garden as preferred
+            setPreferredGardenId(gardenId);
+
+            // Redirect to the same page with the new garden_id
+            const currentPath = path || window.location.pathname;
+            const newUrl = `${currentPath}?garden_id=${gardenId}`;
+            window.location.href = newUrl;
+        }
+
+        // Function to update navigation links with current garden preference
+        function updateNavigationLinks() {
+            const preferredGardenId = getPreferredGardenId();
+            const urlParams = new URLSearchParams(window.location.search);
+            const currentGardenId = urlParams.get('garden_id') || preferredGardenId;
+
+            if (currentGardenId) {
+                // Update all navigation links to include the garden_id parameter
+                const navLinks = document.querySelectorAll('.nav-menu a');
+                navLinks.forEach(link => {
+                    const url = new URL(link.href);
+                    // Don't add garden_id to gardens page or home page
+                    if (url.pathname !== '/gardens' && url.pathname !== '/') {
+                        url.searchParams.set('garden_id', currentGardenId);
+                        link.href = url.toString();
+                    }
+                });
+            }
+        }
     </script>
 </body>
 </html>

@@ -47,11 +47,37 @@
 </div>
 
 <script>
-    // Set current year as default
+    // Set current year as default and highlight current garden
     document.addEventListener('DOMContentLoaded', function() {
         const yearInput = document.getElementById('year');
         if (!yearInput.value) {
             yearInput.value = new Date().getFullYear();
+        }
+
+        // Highlight the current garden based on URL parameter or localStorage
+        const urlParams = new URLSearchParams(window.location.search);
+        let currentGardenId = urlParams.get('garden_id') || getPreferredGardenId();
+
+        if (currentGardenId) {
+            const currentGardenCard = document.getElementById('garden-' + currentGardenId);
+            if (currentGardenCard && !currentGardenCard.classList.contains('current-garden')) {
+                currentGardenCard.classList.add('current-garden');
+
+                // Add current garden badge if it doesn't exist
+                const header = currentGardenCard.querySelector('.garden-header');
+                if (header && !header.querySelector('.current-garden-badge')) {
+                    const badge = document.createElement('span');
+                    badge.className = 'current-garden-badge';
+                    badge.textContent = '✓ Current';
+                    header.appendChild(badge);
+                }
+
+                // Update button text
+                const button = currentGardenCard.querySelector('.btn-primary');
+                if (button && button.textContent.trim() === 'Select Garden') {
+                    button.textContent = 'View Garden';
+                }
+            }
         }
     });
 </script>

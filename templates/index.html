@@ -7,10 +7,17 @@
     <div class="hero">
         <h1>🌱 Welcome to Your Garden Activity Logger</h1>
         {% if current_garden %}
-            <p>Currently viewing: <strong>{{ current_garden.name }}</strong> ({{ current_garden.year }})</p>
-            {% if current_garden.description %}
-                <p class="garden-description">{{ current_garden.description }}</p>
-            {% endif %}
+            <div class="current-garden-info">
+                <p>Currently viewing: <strong>{{ current_garden.name }}</strong> ({{ current_garden.year }})</p>
+                {% if current_garden.location %}
+                    <p class="garden-location">📍 {{ current_garden.location }}</p>
+                {% endif %}
+                {% if current_garden.description %}
+                    <p class="garden-description">{{ current_garden.description }}</p>
+                {% endif %}
+            </div>
+        {% else %}
+            <p>Select a garden to get started, or create your first garden!</p>
         {% endif %}
         <p>Track your garden activities throughout the growing season</p>
     </div>
@@ -53,4 +60,18 @@
         </div>
     </div>
 </div>
+
+<script>
+    // On index page, redirect to preferred garden if no garden_id is present
+    document.addEventListener('DOMContentLoaded', function() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const preferredGardenId = getPreferredGardenId();
+
+        // If no garden_id in URL but we have a preferred garden, redirect to include it
+        if (!urlParams.has('garden_id') && preferredGardenId) {
+            const newUrl = `/?garden_id=${preferredGardenId}`;
+            window.location.href = newUrl;
+        }
+    });
+</script>
 {% endblock %}
