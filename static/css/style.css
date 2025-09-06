@@ -772,6 +772,122 @@ textarea:focus {
 /* CRUD forms */
 .edit-form-container {
     background: #f8f9fa;
+}
+
+/* Garden Card Redesign */
+.garden-card {
+    background: white;
+    border: 2px solid #e9ecef;
+    border-radius: 8px;
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    min-height: 200px;
+    transition: box-shadow 0.3s;
+}
+
+.garden-card:hover {
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+/* Selected Garden Styling */
+.garden-card.selected-garden {
+    border: 2px solid #4CAF50;
+}
+
+/* Garden Header - Name, Year, and Selected Indicator */
+.garden-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+}
+
+.garden-title h3 {
+    color: #2c5530;
+    margin: 0;
+    font-size: 1.2rem;
+    line-height: 1.3;
+}
+
+.garden-year-inline {
+    color: #666;
+    font-weight: normal;
+    font-size: 0.95rem;
+}
+
+.selected-indicator {
+    color: #4CAF50;
+    font-style: italic;
+    font-size: 0.9rem;
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+/* Garden Details */
+.garden-details {
+    flex-grow: 1;
+    margin-bottom: 1rem;
+}
+
+.garden-details p {
+    margin-bottom: 0.5rem;
+    color: #555;
+    font-size: 0.9rem;
+}
+
+/* Garden Actions - Bottom Right */
+.garden-actions {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+}
+
+/* Current Garden Info for Index Page */
+.current-garden-info {
+    background: rgba(76, 175, 80, 0.1);
+    padding: 20px;
+    border-radius: 8px;
+    margin: 15px 0;
+    border-left: 4px solid #4CAF50;
+}
+
+.garden-location {
+    font-style: italic;
+    color: #666;
+    margin: 5px 0;
+    font-size: 0.9rem;
+}
+
+.garden-description {
+    font-style: italic;
+    color: #555;
+    margin: 10px 0;
+}
+
+/* Mobile Responsiveness for Garden Cards */
+@media (max-width: 768px) {
+    .garden-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+
+    .selected-indicator {
+        align-self: flex-end;
+        margin-top: -0.5rem;
+    }
+
+    .garden-actions {
+        justify-content: stretch;
+        flex-direction: column;
+    }
+
+    .garden-actions button {
+        width: 100%;
+    }
+}
     border: 2px solid #4CAF50;
     border-radius: 8px;
     padding: 1.5rem;

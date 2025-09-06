@@ -2,12 +2,13 @@
     {% if gardens %}
         <div class="gardens-grid">
             {% for garden in gardens %}
-                <div class="garden-card {% if current_garden and garden.id == current_garden.id %}current-garden{% endif %}" id="garden-{{ garden.id }}">
+                <div class="garden-card {% if current_garden and garden.id == current_garden.id %}selected-garden{% endif %}" id="garden-{{ garden.id }}">
                     <div class="garden-header">
-                        <h3>{{ garden.name }}</h3>
-                        <span class="garden-year">{{ garden.year }}</span>
+                        <div class="garden-title">
+                            <h3>{{ garden.name }} <span class="garden-year-inline">({{ garden.year }})</span></h3>
+                        </div>
                         {% if current_garden and garden.id == current_garden.id %}
-                            <span class="current-garden-badge">✓ Current</span>
+                            <span class="selected-indicator">Selected</span>
                         {% endif %}
                     </div>
 
