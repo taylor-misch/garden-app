@@ -76,19 +76,42 @@
         document.body.addEventListener('htmx:afterRequest', function(evt) {
             if (evt.detail.successful) {
                 const path = evt.detail.pathInfo.requestPath;
+                const verb = evt.detail.xhr.method || 'GET';
+
+                // Only show toasts for actual form submissions (POST, PUT, DELETE), not GET requests
+                if (verb === 'GET') {
+                    return; // Don't show toasts for GET requests (like loading edit forms)
+                }
+
                 let message = 'Action completed successfully!';
 
-                // Customize message based on the endpoint
-                if (path === '/plant-types') {
+                // Customize message based on the endpoint and method
+                if (path === '/plant-types' && verb === 'POST') {
                     message = 'Plant type added successfully! 🌿';
-                } else if (path === '/harvests') {
+                } else if (path.includes('/plant-types/') && verb === 'PUT') {
+                    message = 'Plant type updated successfully! 🌿';
+                } else if (path === '/harvests' && verb === 'POST') {
                     message = 'Harvest logged successfully! 🥕';
-                } else if (path === '/activities') {
+                } else if (path.includes('/harvests/') && verb === 'PUT') {
+                    message = 'Harvest updated successfully! 🥕';
+                } else if (path === '/activities' && verb === 'POST') {
                     message = 'Garden activity logged! 💧';
-                } else if (path === '/plants') {
+                } else if (path.includes('/activities/') && verb === 'PUT') {
+                    message = 'Activity updated successfully! 💧';
+                } else if (path === '/plants' && verb === 'POST') {
                     message = 'Plant added successfully! 🪴';
-                } else if (path.includes('/journal')) {
+                } else if (path.includes('/plants/') && verb === 'PUT') {
+                    message = 'Plant updated successfully! 🪴';
+                } else if (path === '/gardens' && verb === 'POST') {
+                    message = 'Garden added successfully! 🏡';
+                } else if (path.includes('/gardens/') && verb === 'PUT') {
+                    message = 'Garden updated successfully! 🏡';
+                } else if (path.includes('/journal') && verb === 'POST') {
                     message = 'Journal entry added! 📖';
+                } else if (path.includes('/journal/') && verb === 'PUT') {
+                    message = 'Journal entry updated! 📖';
+                } else if (verb === 'DELETE') {
+                    message = 'Item deleted successfully! 🗑️';
                 }
 
                 showToast(message, 'success');
