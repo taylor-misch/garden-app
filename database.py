@@ -1,14 +1,50 @@
+"""
+Database module for Garden Activity Logger
+Handles all database operations using SQLite with proper error handling and logging.
+"""
+
 import sqlite3
+import logging
 from datetime import datetime
 from typing import List, Optional, Dict, Any
+from contextlib import contextmanager
+
+# Configure logging
+logger = logging.getLogger(__name__)
 
 class Database:
+    """
+    Database class for managing all garden-related data operations.
+    Uses SQLite as the backend database with proper connection management.
+    """
+
     def __init__(self, db_path: str = "garden.db"):
+        """
+        Initialize database connection and create tables if needed.
+
+        Args:
+            db_path: Path to SQLite database file
+        """
         self.db_path = db_path
         self.init_db()
+        logger.info(f"Database initialized at {db_path}")
 
+    @contextmanager
     def get_connection(self):
-        return sqlite3.connect(self.db_path)
+        """
+        Context manager for database connections with automatic cleanup.
+        Ensures connections are properly closed even if errors occur.
+        """
+        conn = sqlite3.connect(self.db_path)
+        conn.row_factory = sqlite3.Row  # Enable column access by name
+        try:
+            yield conn
+        except Exception as e:
+            conn.rollback()
+            logger.error(f"Database operation failed: {e}")
+            raise
+        finally:
+            conn.close()
 
     def init_db(self):
         """Initialize the database with all required tables"""
@@ -142,26 +178,44 @@ class Database:
 
     # Garden CRUD methods
     def add_garden(self, name: str, description: str = "", year: int = None, location: str = "") -> int:
+        """
+        Add a new garden to the database.
+
+        Args:
+            name: Garden name (required)
+            description: Optional garden description
+            year: Garden year (defaults to current year)
+            location: Optional garden location
+
+        Returns:
+            int: ID of the newly created garden
+        """
         if year is None:
             year = datetime.now().year
-        conn = self.get_connection()
-        cursor = conn.cursor()
-        cursor.execute(
-            "INSERT INTO gardens (name, description, year, location) VALUES (?, ?, ?, ?)",
-            (name, description, year, location)
-        )
-        garden_id = cursor.lastrowid
-        conn.commit()
-        conn.close()
-        return garden_id
+
+        with self.get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute(
+                "INSERT INTO gardens (name, description, year, location) VALUES (?, ?, ?, ?)",
+                (name, description, year, location)
+            )
+            garden_id = cursor.lastrowid
+            conn.commit()
+            logger.info(f"Added garden: {name} (ID: {garden_id})")
+            return garden_id
 
     def get_gardens(self) -> List[Dict[str, Any]]:
-        conn = self.get_connection()
-        cursor = conn.cursor()
-        cursor.execute("SELECT id, name, description, year, location FROM gardens ORDER BY year DESC, name")
-        rows = cursor.fetchall()
-        conn.close()
-        return [{"id": row[0], "name": row[1], "description": row[2], "year": row[3], "location": row[4]} for row in rows]
+        """
+        Retrieve all gardens ordered by year (descending) and name.
+
+        Returns:
+            List of garden dictionaries with id, name, description, year, location
+        """
+        with self.get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute("SELECT id, name, description, year, location FROM gardens ORDER BY year DESC, name")
+            rows = cursor.fetchall()
+            return [dict(row) for row in rows]
 
     def get_garden_by_id(self, garden_id: int) -> Optional[Dict[str, Any]]:
         conn = self.get_connection()
