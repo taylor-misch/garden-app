@@ -1,34 +1,57 @@
-# This is a sample Python script.
-
-# Press Shift+F10 to execute it or replace it with your code.
-# Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
-
+"""
+Garden Activity Logger
+A FastAPI application for tracking garden activities, plants, harvests, and journal entries.
+"""
 
 from fastapi import FastAPI, Request, Form, HTTPException
-from fastapi.responses import HTMLResponse, RedirectResponse
+from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from typing import Optional
 from datetime import datetime
+import logging
+
 from database import Database
 
-app = FastAPI(title="Garden Activity Logger", version="1.0.0")
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+# Initialize FastAPI app
+app = FastAPI(
+    title="Garden Activity Logger",
+    description="A comprehensive garden management application for tracking plants, harvests, and activities",
+    version="1.0.0",
+    docs_url="/docs",
+    redoc_url="/redoc"
+)
 
 # Mount static files
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
-# Templates
+# Initialize templates
 templates = Jinja2Templates(directory="templates")
 
-# Database instance
+# Initialize database
 db = Database()
 
-# Helper function to get current garden from session/query params
 def get_current_garden_id(request: Request) -> int:
-    """Get current garden ID from query params or default to first garden"""
+    """
+    Get current garden ID from query params or default to first available garden.
+    Creates a default garden if none exist.
+
+    Args:
+        request: FastAPI Request object containing query parameters
+
+    Returns:
+        int: Garden ID to use for the current request
+    """
     garden_id = request.query_params.get('garden_id')
     if garden_id:
-        return int(garden_id)
+        try:
+            return int(garden_id)
+        except ValueError:
+            logger.warning(f"Invalid garden_id in query params: {garden_id}")
 
     # Default to first garden
     gardens = db.get_gardens()
@@ -36,41 +59,96 @@ def get_current_garden_id(request: Request) -> int:
         return gardens[0]['id']
 
     # If no gardens exist, create a default one
+    logger.info("No gardens found, creating default garden")
     return db.add_garden("My Garden", "Default garden", datetime.now().year)
+
+def get_template_context(request: Request, **kwargs) -> dict:
+    """
+    Get base template context with common variables.
+
+    Args:
+        request: FastAPI Request object
+        **kwargs: Additional context variables
+
+    Returns:
+        dict: Template context dictionary
+    """
+    context = {"request": request}
+    context.update(kwargs)
+    return context
+
+# =============================================================================
+# HOME AND DASHBOARD ROUTES
+# =============================================================================
 
 @app.get("/", response_class=HTMLResponse)
 async def home(request: Request):
-    """Home page with garden selection and navigation"""
-    gardens = db.get_gardens()
-    current_garden_id = get_current_garden_id(request)
-    current_garden = db.get_garden_by_id(current_garden_id)
+    """
+    Home page displaying garden overview and navigation.
+    Shows information for the currently selected garden.
+    """
+    try:
+        current_garden_id = get_current_garden_id(request)
+        current_garden = db.get_garden_by_id(current_garden_id)
 
-    return templates.TemplateResponse("index.html", {
-        "request": request,
-        "gardens": gardens,
-        "current_garden": current_garden
-    })
+        return templates.TemplateResponse("index.html", get_template_context(
+            request,
+            current_garden=current_garden
+        ))
+    except Exception as e:
+        logger.error(f"Error loading home page: {e}")
+        raise HTTPException(status_code=500, detail="Internal server error")
 
-# Garden CRUD endpoints
+# =============================================================================
+# GARDEN MANAGEMENT ROUTES
+# =============================================================================
+
 @app.get("/gardens", response_class=HTMLResponse)
 async def gardens_page(request: Request):
-    """Gardens management page"""
-    gardens = db.get_gardens()
-    return templates.TemplateResponse("gardens.html", {
-        "request": request,
-        "gardens": gardens
-    })
+    """Garden management page for creating, editing, and managing gardens."""
+    try:
+        gardens = db.get_gardens()
+        current_garden_id = get_current_garden_id(request)
+        current_garden = db.get_garden_by_id(current_garden_id)
+
+        return templates.TemplateResponse("gardens.html", get_template_context(
+            request,
+            gardens=gardens,
+            current_garden=current_garden,
+            current_year=datetime.now().year
+        ))
+    except Exception as e:
+        logger.error(f"Error loading gardens page: {e}")
+        raise HTTPException(status_code=500, detail="Internal server error")
 
 @app.post("/gardens")
-async def add_garden(request: Request, name: str = Form(...), description: str = Form(""), 
-                     year: int = Form(...), location: str = Form("")):
-    """Add a new garden"""
-    db.add_garden(name, description, year, location)
-    gardens = db.get_gardens()
-    return templates.TemplateResponse("partials/gardens_list.html", {
-        "request": request,
-        "gardens": gardens
-    })
+async def add_garden(
+    request: Request,
+    name: str = Form(...),
+    description: str = Form(""),
+    year: int = Form(...),
+    location: str = Form("")
+):
+    """Create a new garden."""
+    try:
+        if not name.strip():
+            raise HTTPException(status_code=400, detail="Garden name is required")
+
+        db.add_garden(name.strip(), description.strip(), year, location.strip())
+        gardens = db.get_gardens()
+        current_garden_id = get_current_garden_id(request)
+        current_garden = db.get_garden_by_id(current_garden_id)
+
+        return templates.TemplateResponse("partials/gardens_list.html", get_template_context(
+            request,
+            gardens=gardens,
+            current_garden=current_garden
+        ))
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error adding garden: {e}")
+        raise HTTPException(status_code=500, detail="Failed to add garden")
 
 @app.get("/gardens/{garden_id}/edit", response_class=HTMLResponse)
 async def edit_garden_form(request: Request, garden_id: int):
