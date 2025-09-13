@@ -4,4 +4,7 @@
 
 __pycache__/
 
+# SQLite files
 garden.db
+*.db-wal
+*.db-shm
